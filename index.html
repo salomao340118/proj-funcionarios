@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Startup - Funcionários</title>
+</head>
+<body>
+  <h1>Gestão de Funcionários</h1>
+
+  <!-- Formulário de cadastro (a validação é feita no script.js) -->
+  <form id="form-funcionario">
+    <label>Nome:
+      <input type="text" id="nome" maxlength="100">
+    </label><br><br>
+
+    <!-- Idade: inteiro de 14 a 100 -->
+    <label>Idade:
+      <input type="number" id="idade" min="14" max="100" step="1">
+    </label><br><br>
+
+    <label>Cargo:
+      <input type="text" id="cargo" maxlength="60">
+    </label><br><br>
+
+    <!-- Salário: maior que zero, com até 2 casas decimais -->
+    <label>Salário (R$):
+      <input type="number" id="salario" min="0.01" max="1000000" step="0.01">
+    </label><br><br>
+
+    <!-- O onclick chama a função do script.js -->
+    <button type="button" id="btn-salvar" onclick="cadastrarFuncionario()">Cadastrar</button>
+  </form>
+
+  <h2>Funcionários cadastrados</h2>
+
+  <!-- Tabela preenchida dinamicamente pelo JavaScript -->
+  <table border="1" cellpadding="5">
+    <thead>
+      <tr>
+        <th>ID</th><th>Nome</th><th>Idade</th><th>Cargo</th><th>Salário</th>
+      </tr>
+    </thead>
+    <tbody id="tabela-funcionarios"></tbody>
+  </table>
+
+  <!-- funcionario.js precisa vir ANTES do script.js, pois o script usa a classe -->
+  <script src="funcionario.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
