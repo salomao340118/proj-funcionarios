@@ -4,15 +4,16 @@ let funcionarios = [];
 // Contador usado para gerar um ID único para cada funcionário
 let proximoId = 1;
 
-// >>> MUDANÇA (Exercício 2): guarda o ID do funcionário que está sendo editado
-// (null = estamos cadastrando um funcionário novo)
+// ID do funcionário em edição (null = cadastro novo)
 let idEdicao = null;
 
 // Texto válido: só letras (com acento), separadas por espaço, hífen ou apóstrofo
 const REGEX_TEXTO = /^\p{L}+(?:[ '\-]\p{L}+)*$/u;
 
-// Valida os dados do formulário; retorna mensagem de erro ou null se estiver tudo certo
-function validarFuncionario(nome, idadeTxt, cargo, salarioTxt) {
+// >>> MUDANÇA (Exercício 3): validarFuncionario virou ARROW FUNCTION
+// (antes era "function validarFuncionario(...)")
+// Retorna mensagem de erro ou null se estiver tudo certo
+const validarFuncionario = (nome, idadeTxt, cargo, salarioTxt) => {
   // Nome: só letras, até 100 caracteres
   if (nome.length > 100 || !REGEX_TEXTO.test(nome)) {
     return "O nome deve conter apenas letras (sem números ou símbolos).";
@@ -35,42 +36,62 @@ function validarFuncionario(nome, idadeTxt, cargo, salarioTxt) {
   }
 
   return null; // sem erros
-}
+};
 
-// >>> MUDANÇA (Exercício 2): funções de manipulação do array, ainda no formato tradicional
-// (no Exercício 3 elas serão reescritas como arrow functions)
+// >>> MUDANÇA (Exercício 3): funções de manipulação do array reescritas como
+// ARROW FUNCTIONS (lambdas). Comparação com a versão do Exercício 2:
+//
+//   Antes: function buscarPorId(id) {
+//            return funcionarios.find(function (f) { return f.id === id; });
+//          }
+//   Agora: const buscarPorId = (id) => funcionarios.find((f) => f.id === id);
+//
+// Com um único comando no corpo, dá para omitir as chaves e o "return".
 
 // Busca um funcionário pelo ID (retorna undefined se não encontrar)
-function buscarPorId(id) {
-  return funcionarios.find(function (f) {
-    return f.id === id;
-  });
-}
+const buscarPorId = (id) => funcionarios.find((f) => f.id === id);
 
-// Remove o funcionário com o ID indicado (filter mantém todos, menos ele)
-function removerPorId(id) {
-  funcionarios = funcionarios.filter(function (f) {
-    return f.id !== id;
-  });
-}
+// Busca funcionários cujo nome contém o texto digitado (sem diferenciar maiúsculas)
+const buscarPorNome = (termo) =>
+  funcionarios.filter((f) => f.nome.toLowerCase().includes(termo.toLowerCase()));
 
-// >>> MUDANÇA (Exercício 2): sai do modo edição, limpa o formulário
-// e volta o botão ao texto original
-function cancelarEdicao() {
+// Adiciona um funcionário ao array
+const adicionarFuncionario = (funcionario) => funcionarios.push(funcionario);
+
+// Remove o funcionário com o ID indicado
+const removerPorId = (id) => {
+  funcionarios = funcionarios.filter((f) => f.id !== id);
+};
+
+// Atualiza os dados de um funcionário usando o método atualizar() da classe
+const atualizarFuncionario = (id, nome, idade, cargo, salario) => {
+  buscarPorId(id).atualizar(nome, idade, cargo, salario);
+};
+
+// Referências aos elementos da página, buscadas uma única vez
+const btnSalvar = document.getElementById("btn-salvar");
+const form = document.getElementById("form-funcionario");
+const campoBusca = document.getElementById("busca");
+
+// Sai do modo edição: limpa o formulário e volta o botão ao texto original
+const cancelarEdicao = () => {
   idEdicao = null;
-  document.getElementById("form-funcionario").reset();
-  document.getElementById("btn-salvar").textContent = "Cadastrar";
-}
+  form.reset();
+  btnSalvar.textContent = "Cadastrar";
+};
 
-// >>> MUDANÇA (Exercício 2): antes era cadastrarFuncionario(); agora cadastra OU salva a edição
-function salvarFuncionario() {
-  // Lê os valores digitados (trim remove espaços nas pontas)
+// Redesenha a tabela respeitando o texto que está no campo de busca
+const atualizarTela = () => renderizarTabela(buscarPorNome(campoBusca.value));
+
+// >>> MUDANÇA (Exercício 3): addEventListener com FUNÇÃO ANÔNIMA TRADICIONAL
+// (substitui o onclick="salvarFuncionario()" que ficava no HTML)
+btnSalvar.addEventListener("click", function () {
   const nome = document.getElementById("nome").value.trim();
   const idadeTxt = document.getElementById("idade").value;
   const cargo = document.getElementById("cargo").value.trim();
   const salarioTxt = document.getElementById("salario").value;
 
-  // Valida antes de salvar; se houver erro, avisa e interrompe
+  // Se os dados forem inválidos, avisa e para
   const erro = validarFuncionario(nome, idadeTxt, cargo, salarioTxt);
   if (erro) {
     alert(erro);
@@ -78,72 +99,74 @@ function salvarFuncionario() {
   }
 
   if (idEdicao === null) {
-    // Modo cadastro: cria uma instância da classe e a adiciona ao array
-    funcionarios.push(new Funcionario(proximoId++, nome, Number(idadeTxt), cargo, Number(salarioTxt)));
+    adicionarFuncionario(new Funcionario(proximoId++, nome, Number(idadeTxt), cargo, Number(salarioTxt)));
   } else {
-    // >>> MUDANÇA (Exercício 2): modo edição: busca o funcionário e atualiza
-    // os atributos dele com o método atualizar() da classe
-    const funcionario = buscarPorId(idEdicao);
-    funcionario.atualizar(nome, Number(idadeTxt), cargo, Number(salarioTxt));
+    atualizarFuncionario(idEdicao, nome, Number(idadeTxt), cargo, Number(salarioTxt));
   }
 
-  cancelarEdicao();    // limpa o formulário e sai do modo edição (serve para os dois casos)
-  renderizarTabela();  // atualiza a tabela
-}
+  cancelarEdicao();
+  atualizarTela();
+});
 
-// >>> MUDANÇA (Exercício 2): carrega os dados do funcionário no formulário para edição
-function preencherFormulario(id) {
+// >>> MUDANÇA (Exercício 3): evento do campo de busca, com ARROW FUNCTION
+campoBusca.addEventListener("input", () => atualizarTela());
+
+// Carrega os dados do funcionário no formulário para edição (arrow function)
+const preencherFormulario = (id) => {
   const f = buscarPorId(id);
   document.getElementById("nome").value = f.nome;
   document.getElementById("idade").value = f.idade;
   document.getElementById("cargo").value = f.cargo;
   document.getElementById("salario").value = f.salario;
+  idEdicao = id;
+  btnSalvar.textContent = "Salvar alteração";
+};
 
-  idEdicao = id; // lembra qual funcionário está sendo editado
-  document.getElementById("btn-salvar").textContent = "Salvar alteração";
-}
-
-// >>> MUDANÇA (Exercício 2): cria um botão e associa o evento onclick à função recebida
-function criarBotao(texto, aoClicar) {
+// >>> MUDANÇA (Exercício 3): agora o botão usa addEventListener (antes era botao.onclick = ...)
+const criarBotao = (texto, aoClicar) => {
   const botao = document.createElement("button");
   botao.textContent = texto;
-  botao.onclick = aoClicar;
+  botao.addEventListener("click", aoClicar);
   return botao;
-}
+};
 
-// Desenha a tabela com base no array de funcionários
-function renderizarTabela() {
+// >>> MUDANÇA (Exercício 3): a tabela agora recebe a lista a ser exibida
+// (por padrão, todos os funcionários) e usa forEach com arrow function
+const renderizarTabela = (lista = funcionarios) => {
   const tbody = document.getElementById("tabela-funcionarios");
   tbody.innerHTML = ""; // limpa as linhas antigas
 
-  for (let i = 0; i < funcionarios.length; i++) {
-    const f = funcionarios[i];
+  lista.forEach((f) => {
     const tr = document.createElement("tr");
 
-    // Usa os métodos de acesso (get) da classe para ler os dados
-    const valores = [f.id, f.nome, f.idade, f.cargo, Funcionario.formatarMoeda(f.salario)];
-
-    for (const valor of valores) {
+    // Cria uma célula <td> para cada valor da linha
+    [f.id, f.nome, f.idade, f.cargo, Funcionario.formatarMoeda(f.salario)].forEach((valor) => {
       const td = document.createElement("td");
-      td.textContent = valor; // textContent é seguro: não interpreta HTML
+      td.textContent = valor;
       tr.appendChild(td);
-    }
+    });
 
-    // >>> MUDANÇA (Exercício 2): célula de ações, com onclick recebendo FUNÇÕES ANÔNIMAS
     const tdAcoes = document.createElement("td");
 
+    // Botão Editar: FUNÇÃO ANÔNIMA TRADICIONAL no evento de clique
     tdAcoes.appendChild(criarBotao("Editar", function () {
       preencherFormulario(f.id);
     }));
 
-    tdAcoes.appendChild(criarBotao("Excluir", function () {
+    // >>> MUDANÇA (Exercício 3): botão Excluir com ARROW FUNCTION no evento de clique.
+    // Como substituir uma função anônima tradicional por uma arrow function:
+    //
+    //   Antes (anônima tradicional):  criarBotao("Excluir", function () { ... })
+    //   Agora (arrow function):       criarBotao("Excluir", () => { ... })
+    //
+    // Basta trocar a palavra "function" pela seta "=>" depois dos parênteses.
+    tdAcoes.appendChild(criarBotao("Excluir", () => {
       removerPorId(f.id);
-      // Se o funcionário excluído era o que estava em edição, cancela a edição
       if (idEdicao === f.id) cancelarEdicao();
-      renderizarTabela();
+      atualizarTela();
     }));
 
     tr.appendChild(tdAcoes);
     tbody.appendChild(tr);
-  }
-}
+  });
+};
