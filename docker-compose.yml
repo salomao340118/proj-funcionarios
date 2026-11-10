@@ -1,0 +1,12 @@
+services:
+  web:
+    # Constrói a imagem a partir do Dockerfile da pasta atual
+    build: .
+    container_name: startup-funcionarios
+    ports:
+      # Porta 8081 do seu computador -> porta 80 do container
+      - "8081:80"
+    volumes:
+      # Espelha a pasta do projeto dentro do container (somente leitura).
+      # Ao salvar um arquivo, basta atualizar o navegador (F5).
+      - .:/usr/share/nginx/html:ro
