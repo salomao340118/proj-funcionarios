@@ -27,8 +27,9 @@
       <input type="number" id="salario" min="0.01" max="1000000" step="0.01">
     </label><br><br>
 
-    <!-- O onclick chama a função do script.js -->
-    <button type="button" id="btn-salvar" onclick="cadastrarFuncionario()">Cadastrar</button>
+    <!-- >>> MUDANÇA (Exercício 2): a função cadastrarFuncionario() virou salvarFuncionario(),
+         pois agora o mesmo botão cadastra um funcionário novo OU salva uma edição -->
+    <button type="button" id="btn-salvar" onclick="salvarFuncionario()">Cadastrar</button>
   </form>
 
   <h2>Funcionários cadastrados</h2>
@@ -37,7 +38,8 @@
   <table border="1" cellpadding="5">
     <thead>
       <tr>
-        <th>ID</th><th>Nome</th><th>Idade</th><th>Cargo</th><th>Salário</th>
+        <!-- >>> MUDANÇA (Exercício 2): nova coluna "Ações" (botões Editar e Excluir) -->
+        <th>ID</th><th>Nome</th><th>Idade</th><th>Cargo</th><th>Salário</th><th>Ações</th>
       </tr>
     </thead>
     <tbody id="tabela-funcionarios"></tbody>

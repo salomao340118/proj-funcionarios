@@ -4,6 +4,10 @@ let funcionarios = [];
 // Contador usado para gerar um ID único para cada funcionário
 let proximoId = 1;
 
+// >>> MUDANÇA (Exercício 2): guarda o ID do funcionário que está sendo editado
+// (null = estamos cadastrando um funcionário novo)
+let idEdicao = null;
+
 // Texto válido: só letras (com acento), separadas por espaço, hífen ou apóstrofo
 const REGEX_TEXTO = /^\p{L}+(?:[ '\-]\p{L}+)*$/u;
 
@@ -33,8 +37,33 @@ function validarFuncionario(nome, idadeTxt, cargo, salarioTxt) {
   return null; // sem erros
 }
 
-// Chamada ao clicar em "Cadastrar"
-function cadastrarFuncionario() {
+// >>> MUDANÇA (Exercício 2): funções de manipulação do array, ainda no formato tradicional
+// (no Exercício 3 elas serão reescritas como arrow functions)
+
+// Busca um funcionário pelo ID (retorna undefined se não encontrar)
+function buscarPorId(id) {
+  return funcionarios.find(function (f) {
+    return f.id === id;
+  });
+}
+
+// Remove o funcionário com o ID indicado (filter mantém todos, menos ele)
+function removerPorId(id) {
+  funcionarios = funcionarios.filter(function (f) {
+    return f.id !== id;
+  });
+}
+
+// >>> MUDANÇA (Exercício 2): sai do modo edição, limpa o formulário
+// e volta o botão ao texto original
+function cancelarEdicao() {
+  idEdicao = null;
+  document.getElementById("form-funcionario").reset();
+  document.getElementById("btn-salvar").textContent = "Cadastrar";
+}
+
+// >>> MUDANÇA (Exercício 2): antes era cadastrarFuncionario(); agora cadastra OU salva a edição
+function salvarFuncionario() {
   // Lê os valores digitados (trim remove espaços nas pontas)
   const nome = document.getElementById("nome").value.trim();
   const idadeTxt = document.getElementById("idade").value;
@@ -48,12 +77,38 @@ function cadastrarFuncionario() {
     return;
   }
 
-  // Cria uma instância da classe e a adiciona ao array
-  const funcionario = new Funcionario(proximoId++, nome, Number(idadeTxt), cargo, Number(salarioTxt));
-  funcionarios.push(funcionario);
+  if (idEdicao === null) {
+    // Modo cadastro: cria uma instância da classe e a adiciona ao array
+    funcionarios.push(new Funcionario(proximoId++, nome, Number(idadeTxt), cargo, Number(salarioTxt)));
+  } else {
+    // >>> MUDANÇA (Exercício 2): modo edição: busca o funcionário e atualiza
+    // os atributos dele com o método atualizar() da classe
+    const funcionario = buscarPorId(idEdicao);
+    funcionario.atualizar(nome, Number(idadeTxt), cargo, Number(salarioTxt));
+  }
 
-  document.getElementById("form-funcionario").reset(); // limpa o formulário
-  renderizarTabela();                                  // atualiza a tabela
+  cancelarEdicao();    // limpa o formulário e sai do modo edição (serve para os dois casos)
+  renderizarTabela();  // atualiza a tabela
+}
+
+// >>> MUDANÇA (Exercício 2): carrega os dados do funcionário no formulário para edição
+function preencherFormulario(id) {
+  const f = buscarPorId(id);
+  document.getElementById("nome").value = f.nome;
+  document.getElementById("idade").value = f.idade;
+  document.getElementById("cargo").value = f.cargo;
+  document.getElementById("salario").value = f.salario;
+
+  idEdicao = id; // lembra qual funcionário está sendo editado
+  document.getElementById("btn-salvar").textContent = "Salvar alteração";
+}
+
+// >>> MUDANÇA (Exercício 2): cria um botão e associa o evento onclick à função recebida
+function criarBotao(texto, aoClicar) {
+  const botao = document.createElement("button");
+  botao.textContent = texto;
+  botao.onclick = aoClicar;
+  return botao;
 }
 
 // Desenha a tabela com base no array de funcionários
@@ -74,6 +129,21 @@ function renderizarTabela() {
       tr.appendChild(td);
     }
 
+    // >>> MUDANÇA (Exercício 2): célula de ações, com onclick recebendo FUNÇÕES ANÔNIMAS
+    const tdAcoes = document.createElement("td");
+
+    tdAcoes.appendChild(criarBotao("Editar", function () {
+      preencherFormulario(f.id);
+    }));
+
+    tdAcoes.appendChild(criarBotao("Excluir", function () {
+      removerPorId(f.id);
+      // Se o funcionário excluído era o que estava em edição, cancela a edição
+      if (idEdicao === f.id) cancelarEdicao();
+      renderizarTabela();
+    }));
+
+    tr.appendChild(tdAcoes);
     tbody.appendChild(tr);
   }
 }

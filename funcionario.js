@@ -25,6 +25,15 @@ class Funcionario {
   get salario() { return this._salario; }
   set salario(valor) { this._salario = valor; }
 
+  // >>> MUDANÇA (Exercício 2): NOVO MÉTODO que atualiza todos os atributos de uma vez
+  // (usa os setters acima). É chamado ao salvar uma edição.
+  atualizar(nome, idade, cargo, salario) {
+    this.nome = nome;
+    this.idade = idade;
+    this.cargo = cargo;
+    this.salario = salario;
+  }
+
   // Método estático: pertence à classe, não a um funcionário específico.
   // Formata um número como moeda brasileira (ex.: 5000 -> "R$ 5.000,00")
   static formatarMoeda(valor) {
