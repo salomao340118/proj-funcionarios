@@ -106,9 +106,11 @@ const preencherFormulario = (id) => {
 };
 
 // Cria um botão e associa a ele o evento de clique recebido
-const criarBotao = (texto, aoClicar) => {
+// >>> MUDANÇA (Bootstrap): novo parâmetro "classes" com as classes CSS do Bootstrap do botão
+const criarBotao = (texto, aoClicar, classes) => {
   const botao = document.createElement("button");
   botao.textContent = texto;
+  botao.className = classes;
   botao.addEventListener("click", aoClicar);
   return botao;
 };
@@ -130,25 +132,25 @@ const renderizarTabela = (lista = funcionarios) => {
     const tdAcoes = document.createElement("td");
 
     // Botão Editar: função anônima tradicional
+    // >>> MUDANÇA (Bootstrap): btn-warning (amarelo) e btn-sm (pequeno); me-1 = margem à direita
     tdAcoes.appendChild(criarBotao("Editar", function () {
       preencherFormulario(f.id);
-    }));
+    }, "btn btn-warning btn-sm me-1"));
 
     // Botão Excluir: arrow function
+    // >>> MUDANÇA (Bootstrap): btn-danger (vermelho)
     tdAcoes.appendChild(criarBotao("Excluir", () => {
       removerPorId(f.id);
       if (idEdicao === f.id) cancelarEdicao();
       atualizarTela();
-    }));
+    }, "btn btn-danger btn-sm"));
 
     tr.appendChild(tdAcoes);
     tbody.appendChild(tr);
   });
 };
 
-// =====================================================================
-// >>> MUDANÇA (Exercício 4): TUDO daqui para baixo é NOVO (relatórios)
-// =====================================================================
+// ================== RELATÓRIOS ==================
 
 // Área da página onde os relatórios aparecem
 const resultado = document.getElementById("resultado-relatorio");
@@ -159,32 +161,40 @@ const mostrar = (titulo, linhas) => {
 
   const h3 = document.createElement("h3");
   h3.textContent = titulo;
+  // >>> MUDANÇA (Bootstrap): h5 = tamanho de título menor; mt-3 = margem acima
+  h3.className = "h5 mt-3";
   resultado.appendChild(h3);
 
   // Se não há dados, avisa e encerra
   if (linhas.length === 0) {
-    resultado.appendChild(document.createTextNode("Nenhum dado para exibir."));
+    // >>> MUDANÇA (Bootstrap): caixa de aviso cinza (alert alert-secondary)
+    const aviso = document.createElement("div");
+    aviso.className = "alert alert-secondary";
+    aviso.textContent = "Nenhum dado para exibir.";
+    resultado.appendChild(aviso);
     return;
   }
 
-  // Monta uma lista <ul> com um <li> por item
+  // >>> MUDANÇA (Bootstrap): a lista vira um "list-group" (itens com borda, empilhados)
   const ul = document.createElement("ul");
+  ul.className = "list-group";
   linhas.forEach((texto) => {
     const li = document.createElement("li");
+    li.className = "list-group-item";
     li.textContent = texto;
     ul.appendChild(li);
   });
   resultado.appendChild(ul);
 };
 
-// >>> MUDANÇA (Exercício 4): relatório de salários altos, com FILTER e MAP
+// relatório de salários altos, com FILTER e MAP
 // filter mantém só quem ganha MAIS de 5000 (estritamente maior); map transforma cada um em texto
 document.getElementById("btn-salario-alto").addEventListener("click", () => {
   const altos = funcionarios.filter((f) => f.salario > 5000);
   mostrar("Funcionários com salário maior que R$ 5.000,00", altos.map((f) => f.toString()));
 });
 
-// >>> MUDANÇA (Exercício 4): média salarial, com REDUCE
+// média salarial, com REDUCE
 // reduce soma todos os salários; depois dividimos pela quantidade
 document.getElementById("btn-media-salarial").addEventListener("click", () => {
   if (funcionarios.length === 0) return mostrar("Média salarial", []); // evita dividir por zero
@@ -192,7 +202,7 @@ document.getElementById("btn-media-salarial").addEventListener("click", () => {
   mostrar("Média salarial", [Funcionario.formatarMoeda(soma / funcionarios.length)]);
 });
 
-// >>> MUDANÇA (Exercício 4): cargos únicos, com MAP, NEW SET e FIND
+// cargos únicos, com MAP, NEW SET e FIND
 // 1) map + toLowerCase pega os cargos em minúsculo, para "Dev" e "dev" contarem como iguais
 // 2) new Set remove as repetições
 // 3) [...set] converte o Set de volta em array
@@ -205,7 +215,7 @@ document.getElementById("btn-cargos-unicos").addEventListener("click", () => {
   mostrar("Cargos únicos", cargosUnicos);
 });
 
-// >>> MUDANÇA (Exercício 4): lista de nomes em maiúsculo, com MAP
+// lista de nomes em maiúsculo, com MAP
 document.getElementById("btn-nomes-maiusculos").addEventListener("click", () => {
   const nomes = funcionarios.map((f) => f.nome.toLocaleUpperCase("pt-BR"));
   mostrar("Nomes em maiúsculo", nomes);

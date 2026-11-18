@@ -2,59 +2,105 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <!-- >>> MUDANÇA (Bootstrap): viewport, necessário para o layout responsivo funcionar no celular -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Startup - Funcionários</title>
+
+  <!-- >>> MUDANÇA (Bootstrap): CSS do Bootstrap via CDN (precisa de internet) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>Gestão de Funcionários</h1>
 
-  <!-- Formulário de cadastro (a validação é feita no script.js) -->
-  <form id="form-funcionario">
-    <label>Nome:
-      <input type="text" id="nome" maxlength="100">
-    </label><br><br>
+<!-- >>> MUDANÇA (Bootstrap): bg-light = fundo cinza claro -->
+<body class="bg-light">
 
-    <!-- Idade: inteiro de 14 a 100 -->
-    <label>Idade:
-      <input type="number" id="idade" min="14" max="100" step="1">
-    </label><br><br>
+  <!-- >>> MUDANÇA (Bootstrap): container centraliza o conteúdo; py-4 = espaçamento vertical -->
+  <div class="container py-4">
 
-    <label>Cargo:
-      <input type="text" id="cargo" maxlength="60">
-    </label><br><br>
+    <h1 class="mb-4">Gestão de Funcionários</h1>
 
-    <!-- Salário: maior que zero, com até 2 casas decimais -->
-    <label>Salário (R$):
-      <input type="number" id="salario" min="0.01" max="1000000" step="0.01">
-    </label><br><br>
+    <!-- >>> MUDANÇA (Bootstrap): o formulário agora fica dentro de um "card" -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header">Cadastro de funcionário</div>
+      <div class="card-body">
 
-    <button type="button" id="btn-salvar">Cadastrar</button>
-  </form>
+        <!-- Formulário de cadastro (a validação é feita no script.js) -->
+        <form id="form-funcionario">
+          <!-- row + col-md-*: grade responsiva (2 colunas no computador, 1 no celular) -->
+          <div class="row g-3">
 
-  <h2>Funcionários cadastrados</h2>
+            <div class="col-md-6">
+              <label for="nome" class="form-label">Nome</label>
+              <input type="text" class="form-control" id="nome" maxlength="100">
+            </div>
 
-  <label>Buscar por nome:
-    <input type="text" id="busca">
-  </label><br><br>
+            <!-- Idade: inteiro de 14 a 100 -->
+            <div class="col-md-6">
+              <label for="idade" class="form-label">Idade</label>
+              <input type="number" class="form-control" id="idade" min="14" max="100" step="1">
+            </div>
 
-  <table border="1" cellpadding="5">
-    <thead>
-      <tr>
-        <th>ID</th><th>Nome</th><th>Idade</th><th>Cargo</th><th>Salário</th><th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="tabela-funcionarios"></tbody>
-  </table>
+            <div class="col-md-6">
+              <label for="cargo" class="form-label">Cargo</label>
+              <input type="text" class="form-control" id="cargo" maxlength="60">
+            </div>
 
-  <!-- >>> MUDANÇA (Exercício 4): SEÇÃO NOVA de relatórios (botões + área de resultado) -->
-  <h2>Relatórios</h2>
-  <button id="btn-salario-alto">Salário maior que R$ 5.000</button>
-  <button id="btn-media-salarial">Média salarial</button>
-  <button id="btn-cargos-unicos">Cargos únicos</button>
-  <button id="btn-nomes-maiusculos">Nomes em maiúsculo</button>
+            <!-- Salário: maior que zero, com até 2 casas decimais -->
+            <div class="col-md-6">
+              <label for="salario" class="form-label">Salário (R$)</label>
+              <input type="number" class="form-control" id="salario" min="0.01" max="1000000" step="0.01">
+            </div>
 
-  <!-- Área onde o resultado do relatório é exibido -->
-  <div id="resultado-relatorio"></div>
-  <!-- >>> FIM DA MUDANÇA (Exercício 4) -->
+            <div class="col-12">
+              <!-- btn btn-primary = botão azul do Bootstrap -->
+              <button type="button" id="btn-salvar" class="btn btn-primary">Cadastrar</button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+    <h2 class="h4">Funcionários cadastrados</h2>
+
+    <!-- >>> MUDANÇA (Bootstrap): campo de busca com largura limitada (col-md-6) -->
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="busca" class="form-label">Buscar por nome</label>
+        <input type="text" class="form-control" id="busca">
+      </div>
+    </div>
+
+    <!-- >>> MUDANÇA (Bootstrap): table-responsive cria rolagem lateral em telas pequenas;
+         as classes "table ..." estilizam a tabela (listras, destaque ao passar o mouse) -->
+    <div class="table-responsive mb-4">
+      <table class="table table-striped table-hover table-bordered align-middle bg-white">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th><th>Nome</th><th>Idade</th><th>Cargo</th><th>Salário</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-funcionarios"></tbody>
+      </table>
+    </div>
+
+    <!-- Seção de relatórios: cada botão gera um relatório -->
+    <h2 class="h4">Relatórios</h2>
+
+    <!-- >>> MUDANÇA (Bootstrap): d-flex flex-wrap gap-2 = botões lado a lado, quebrando de linha se faltar espaço -->
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <button id="btn-salario-alto" class="btn btn-outline-primary">Salário maior que R$ 5.000</button>
+      <button id="btn-media-salarial" class="btn btn-outline-primary">Média salarial</button>
+      <button id="btn-cargos-unicos" class="btn btn-outline-primary">Cargos únicos</button>
+      <button id="btn-nomes-maiusculos" class="btn btn-outline-primary">Nomes em maiúsculo</button>
+    </div>
+
+    <!-- Área onde o resultado do relatório é exibido -->
+    <div id="resultado-relatorio"></div>
+
+  </div>
+
+  <!-- >>> MUDANÇA (Bootstrap): JavaScript do Bootstrap (inclui o Popper), antes dos nossos scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.9/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- funcionario.js precisa vir ANTES do script.js, pois o script usa a classe -->
   <script src="funcionario.js"></script>

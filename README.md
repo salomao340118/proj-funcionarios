@@ -1,6 +1,6 @@
-# Projeto - Gestão de Funcionários
+# Startup - Gestão de Funcionários
 
-CRUD de funcionários em HTML + JavaScript puro, rodando em Docker.
+CRUD de funcionários em HTML + JavaScript puro, com interface em **Bootstrap 5**, rodando em Docker.
 
 ## Como rodar
     docker compose up --build
